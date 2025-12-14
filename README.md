@@ -1,181 +1,118 @@
-# AccessJet 🚀
+# 🚀 AccessJet
 
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
-![Playwright](https://img.shields.io/badge/Playwright-45ba4b?logo=playwright&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+AccessJet is a blazing fast, developer-centric accessibility (a11y) CLI tool built for modern CI/CD pipelines.
 
-> **Blazing fast, DX-first accessibility (a11y) auditor** that delivers instant feedback without compromising accuracy. Built for modern development workflows where speed meets compliance.
+Unlike traditional tools that load entire web pages, AccessJet optimizes the auditing process by intercepting network requests and focusing purely on the DOM structure required for accurate analysis. It provides instant, actionable feedback directly in your terminal without the noise.
 
-![AccessJet Demo](assets/demo.svg)
+## ✨ Why AccessJet?
 
-## 🎯 The "Why" - Engineering Philosophy
+⚡ **Performance First**: Achieves sub-second audits by strictly blocking non-essential resources (images, fonts, media) at the network layer.
 
-### The Accuracy vs. Speed Trade-off
+🛠 **Developer Experience (DX)**: No more wall of text. Minified HTML is automatically formatted (Prettier), truncated, and syntax-highlighted in the terminal.
 
-Accessibility auditing faces a fundamental tension: **accuracy requires loading complete pages**, but **speed demands optimization**. Traditional tools load everything—images, fonts, CSS, JavaScript—creating bottlenecks that make audits impractical for development workflows.
+🚦 **CI/CD Quality Gates**: Define strict failure thresholds (e.g., fail only on critical issues) to integrate safely into existing pipelines.
 
-AccessJet resolves this through intelligent **Network Interception**. Using Playwright's `page.route()`, we selectively block resource-heavy assets (images, fonts, external scripts) while preserving the DOM structure essential for accurate Axe-core analysis. This achieves **sub-second audits** without sacrificing compliance accuracy.
+🔄 **Concurrency**: Parallel execution engine allows scanning multiple URLs simultaneously without resource exhaustion.
 
-```typescript
-// Strategic asset blocking for performance
-await page.route("**/*", (route) => {
-  const resourceType = route.request().resourceType();
-  if (["image", "font", "media"].includes(resourceType)) {
-    route.abort(); // Block bloat, preserve structure
-  } else {
-    route.continue();
-  }
-});
-```
-
-## 🏗️ Architecture (The Interview Section)
-
-### Singleton Pattern: Efficient Resource Management
-
-AccessJet employs a **Singleton Browser Pattern** for optimal resource utilization. A single browser instance is initialized once and reused across multiple URL scans, eliminating startup overhead while maintaining complete isolation between audits.
-
-```typescript
-class PageScanner {
-  private static browser: Browser | null = null;
-
-  static async getBrowser(): Promise<Browser> {
-    if (!this.browser) {
-      this.browser = await chromium.launch();
-    }
-    return this.browser;
-  }
-}
-```
-
-### The Processing Pipeline
-
-Raw accessibility data undergoes a sophisticated four-stage transformation:
-
-```
-Raw HTML → Prettier Formatting → Smart Truncation → Syntax Highlighting → CLI Output
-```
-
-- **Prettier**: Consistent, readable HTML formatting
-- **Smart Truncation**: Container guards prevent `<html>`/`<body>` dumps, showing only relevant 10-line snippets
-- **Syntax Highlighting**: CLI-highlight provides color-coded terminal output
-- **CLI Output**: Structured tables with impact-level color coding
-
-### Concurrency Engine
-
-Powered by `p-limit`, the **BatchRunner** manages controlled parallel execution. Configurable concurrency prevents resource exhaustion while maximizing throughput for enterprise-scale auditing.
-
-```typescript
-const limit = pLimit(options.concurrency);
-const results = await Promise.all(
-  urls.map((url) => limit(() => scanSingleUrl(url)))
-);
-```
-
-## ✨ Key Features
-
-- ⚡ **Sub-Second Audits**: Network interception eliminates asset loading bottlenecks
-- 🎯 **Smart Snippets**: Actionable HTML context instead of overwhelming page dumps
-- 🔧 **CI/CD Thresholds**: Configurable `--fail-on` levels for progressive compliance adoption
-- 🚀 **Zero-Config Setup**: Install and scan immediately, no complex configuration
-- 📊 **Rich Developer Experience**: Color-coded output, progress spinners, structured reporting
-- 📄 **JSON Export**: Full reports for integration with existing toolchains
-
-## 🔗 CI/CD Integration
-
-### GitHub Actions Workflow
-
-Add this to `.github/workflows/accessibility.yml` for automated auditing:
-
-```yaml
-name: Accessibility Audit
-
-on:
-  pull_request:
-    branches: [main, develop]
-
-jobs:
-  accessibility:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-
-      - name: Install AccessJet
-        run: npm install -g accessjet
-
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
-
-      - name: Development Audit (Permissive)
-        run: accessjet check --fail-on serious http://localhost:3000
-        continue-on-error: true
-
-      - name: Production Audit (Strict)
-        run: accessjet check --fail-on moderate https://myapp.com
-```
-
-## 🚀 Installation & Usage
+## 📦 Installation
 
 ```bash
 npm install -g accessjet
 ```
 
+## 🚀 Usage
+
 ### Basic Scan
+
+Check a single URL for accessibility violations:
 
 ```bash
 accessjet check https://example.com
 ```
 
-### High Concurrency
+### High Performance Mode
+
+Scan multiple routes in parallel. The default concurrency is 5, but you can adjust this based on your machine's resources:
 
 ```bash
-accessjet check -c 10 https://site1.com https://site2.com
+accessjet check https://site.com/home https://site.com/about -c 10
 ```
 
-### CI/CD Strict Mode
+### CI/CD "Strict" Mode
+
+In a CI environment, you might want to block the build only if Critical issues are found, ignoring Minor or Moderate warnings:
 
 ```bash
-accessjet check --fail-on critical https://myapp.com
+accessjet check https://myapp.com --fail-on critical
 ```
 
-### Full JSON Report
+## ⚙️ Configuration
 
-```bash
-accessjet check -j https://example.com
+| Flag | Alias | Description | Default |
+|------|-------|-------------|---------|
+| --concurrency | -c | Number of concurrent browser contexts. | 5 |
+| --fail-on | -f | Minimum impact level to trigger exit code 1 (minor, moderate, serious, critical). | moderate |
+| --json | -j | Export full report to report.json. | false |
+
+## 🏗 Architecture & Performance
+
+AccessJet is built on Playwright and Axe-core, but utilizes a custom execution pipeline designed for speed.
+
+### 1. Network Interception Strategy
+
+To minimize scan time, AccessJet hooks into the browser's network layer. It proactively aborts requests for assets that do not affect the accessibility tree (images, fonts, stylesheets, media), ensuring that bandwidth is consumed only by the document structure.
+
+### 2. Isolated Browser Contexts
+
+Instead of launching a new browser instance for every URL (which is expensive), AccessJet initializes a single browser instance and utilizes lightweight BrowserContexts for isolation. This significantly reduces memory overhead during batch processing.
+
+### 3. The Output Pipeline
+
+Raw HTML from modern SPAs is often minified and unreadable. AccessJet processes the failing nodes through a dedicated formatting pipeline before displaying them:
+
+```
+Raw DOM Node → Prettier (HTML Parser) → Intelligent Truncation → Syntax Highlighting
 ```
 
-### Options
+## 🤖 GitHub Actions Integration
 
+You can add AccessJet to your PR workflow to prevent accessibility regressions.
+
+```yaml
+.github/workflows/a11y.yml
+name: Accessibility Audit
+
+on: [pull_request]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '18' }
+      - name: Install Dependencies
+        run: |
+          npm install -g accessjet
+          npx playwright install chromium
+      - name: Run Audit
+        # Fails only on critical issues
+        run: accessjet check https://your-staging-url.com --fail-on critical
 ```
-Usage: accessjet check [options] <urls...>
 
-Options:
-  -c, --concurrency <number>  Concurrency level (default: "5")
-  -j, --json                  Output full JSON report to report.json
-  -f, --fail-on <level>       Minimum impact level to fail the build
-                              (minor, moderate, serious, critical) (default: "moderate")
-  -h, --help                  Display help for command
-```
+## 🛠 Local Development
 
-## 🛠️ Development
+To contribute to AccessJet:
 
 ```bash
 git clone https://github.com/berkinduz/access-jet.git
 cd access-jet
 npm install
 npm run build
-npm run generate-demo  # Generate demo SVG
+# Generate the demo SVG seen in this README
+npm run generate-demo
 ```
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-**Built for developers who demand both speed and accuracy in accessibility compliance.**
+Distributed under the MIT License. See LICENSE for more information.

@@ -52,15 +52,30 @@ async function generateDemo() {
       height: "auto",
     });
 
+    // Fix text positioning by adjusting y-coordinates
+    let fixedSvg = svg.replace(
+      /y="(-?\d+(?:\.\d+)?)"/g,
+      (_match: string, y: string) => {
+        const newY = parseFloat(y) + 20; // Add padding offset
+        return `y="${newY}"`;
+      }
+    );
+
+    // Update viewBox to accommodate the repositioned content
+    fixedSvg = fixedSvg.replace(
+      /viewBox="[^"]*"/,
+      'viewBox="0, 0, 798.13, 120"'
+    );
+
     // Add terminal window styling
-    const styledSvg = svg.replace(
+    fixedSvg = fixedSvg.replace(
       "<svg",
-      `<svg style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);"`
+      `<svg style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); background: #1e1e1e;"`
     );
 
     // Save to assets/demo.svg
     const outputPath = path.join(__dirname, "..", "assets", "demo.svg");
-    fs.writeFileSync(outputPath, styledSvg);
+    fs.writeFileSync(outputPath, fixedSvg);
 
     console.log(`🎨 Demo SVG generated at ${outputPath}`);
   } catch (error) {
