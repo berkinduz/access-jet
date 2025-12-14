@@ -2,7 +2,6 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-const ansiToSvg = require("ansi-to-svg");
 
 const execAsync = promisify(exec);
 
@@ -19,65 +18,28 @@ async function generateDemo() {
       }
     );
 
-    console.log("✅ Scan completed, converting to SVG...");
+    console.log("✅ Scan completed, creating simple demo image...");
 
-    // Convert ANSI output to SVG with dark terminal styling
-    const svg = ansiToSvg(stdout, {
-      fontFamily:
-        'Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-      fontSize: 14,
-      lineHeight: 1.2,
-      theme: {
-        background: "#1e1e1e",
-        foreground: "#d4d4d4",
-        black: "#000000",
-        red: "#f44747",
-        green: "#6a9955",
-        yellow: "#dcdcaa",
-        blue: "#4fc1ff",
-        magenta: "#c586c0",
-        cyan: "#4ec9b0",
-        white: "#d4d4d4",
-        brightBlack: "#808080",
-        brightRed: "#f44747",
-        brightGreen: "#6a9955",
-        brightYellow: "#dcdcaa",
-        brightBlue: "#4fc1ff",
-        brightMagenta: "#c586c0",
-        brightCyan: "#4ec9b0",
-        brightWhite: "#ffffff",
-      },
-      padding: "20px",
-      width: 800,
-      height: "auto",
-    });
+    // Strip ANSI escape codes from output
+    const cleanOutput = stdout.replace(/\x1B\[[0-9;]*[mG]/g, '');
 
-    // Fix text positioning by adjusting y-coordinates
-    let fixedSvg = svg.replace(
-      /y="(-?\d+(?:\.\d+)?)"/g,
-      (_match: string, y: string) => {
-        const newY = parseFloat(y) + 20; // Add padding offset
-        return `y="${newY}"`;
-      }
-    );
+    // Create a simple SVG with the output as plain text
+    const lines = cleanOutput.split('\n').slice(0, 12); // Take first 12 lines
+    const svgHeight = lines.length * 20 + 40;
 
-    // Update viewBox to accommodate the repositioned content
-    fixedSvg = fixedSvg.replace(
-      /viewBox="[^"]*"/,
-      'viewBox="0, 0, 798.13, 120"'
-    );
-
-    // Add terminal window styling
-    fixedSvg = fixedSvg.replace(
-      "<svg",
-      `<svg style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); background: #1e1e1e;"`
-    );
+    const svgContent = `<svg width="800" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#1e1e1e" rx="8"/>
+      <text x="20" y="30" fill="#00ff00" font-family="Monaco, monospace" font-size="14">
+        ${lines.map(line => line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')).join('&#10;')}
+      </text>
+    </svg>`;
 
     // Save to assets/demo.svg
     const outputPath = path.join(__dirname, "..", "assets", "demo.svg");
-    fs.writeFileSync(outputPath, fixedSvg);
+    fs.writeFileSync(outputPath, svgContent);
 
-    console.log(`🎨 Demo SVG generated at ${outputPath}`);
+    console.log(`🎨 Simple demo SVG generated at ${outputPath}`);
+
   } catch (error) {
     console.error("❌ Error generating demo:", error);
     process.exit(1);
