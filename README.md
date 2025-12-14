@@ -5,43 +5,35 @@
 ![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-> **Blazing fast, developer-centric accessibility (a11y) CLI tool** that delivers instant feedback without the noise. Built for modern development workflows where speed meets accessibility compliance.
+> **Blazing fast, DX-first accessibility (a11y) auditor** that delivers instant feedback without compromising accuracy. Built for modern development workflows where speed meets compliance.
+
+![AccessJet Demo](assets/demo.svg)
 
 ## 🎯 The "Why" - Engineering Philosophy
 
-### Speed-First Architecture
+### The Accuracy vs. Speed Trade-off
 
-Traditional accessibility tools are painfully slow. They load entire pages with all assets - images, fonts, CSS, JavaScript - creating unnecessary bottlenecks in development workflows. AccessJet takes a different approach:
+Accessibility auditing faces a fundamental tension: **accuracy requires loading complete pages**, but **speed demands optimization**. Traditional tools load everything—images, fonts, CSS, JavaScript—creating bottlenecks that make audits impractical for development workflows.
 
-**Network Interception Strategy**: Using Playwright's `page.route()`, we intelligently block heavy assets (images, fonts, external scripts) while preserving the DOM structure needed for accurate accessibility analysis. This results in **~10x faster scans** compared to traditional tools.
+AccessJet resolves this through intelligent **Network Interception**. Using Playwright's `page.route()`, we selectively block resource-heavy assets (images, fonts, external scripts) while preserving the DOM structure essential for accurate Axe-core analysis. This achieves **sub-second audits** without sacrificing compliance accuracy.
 
 ```typescript
-// Core optimization: Block non-essential assets for lightning-fast scans
+// Strategic asset blocking for performance
 await page.route("**/*", (route) => {
   const resourceType = route.request().resourceType();
   if (["image", "font", "media"].includes(resourceType)) {
-    route.abort();
+    route.abort(); // Block bloat, preserve structure
   } else {
     route.continue();
   }
 });
 ```
 
-### DX-First Output Design
+## 🏗️ Architecture (The Interview Section)
 
-The "wall of text" problem plagues accessibility tools. Raw HTML dumps overwhelm developers, making it impossible to focus on actionable fixes. AccessJet solves this with a three-stage pipeline:
+### Singleton Pattern: Efficient Resource Management
 
-1. **Smart HTML Capture**: Extract relevant code snippets without dumping entire page content
-2. **Prettier Formatting**: Clean, readable HTML with proper indentation
-3. **Intelligent Truncation**: Show only 10 lines of context with syntax highlighting
-
-**Result**: Developers get **actionable, scannable feedback** instead of information overload.
-
-## 🏗️ Technical Architecture
-
-### Singleton Browser Pattern
-
-Efficient resource management through a shared browser instance across multiple URL scans. This pattern eliminates browser startup overhead while maintaining isolation between scans.
+AccessJet employs a **Singleton Browser Pattern** for optimal resource utilization. A single browser instance is initialized once and reused across multiple URL scans, eliminating startup overhead while maintaining complete isolation between audits.
 
 ```typescript
 class PageScanner {
@@ -56,9 +48,22 @@ class PageScanner {
 }
 ```
 
+### The Processing Pipeline
+
+Raw accessibility data undergoes a sophisticated four-stage transformation:
+
+```
+Raw HTML → Prettier Formatting → Smart Truncation → Syntax Highlighting → CLI Output
+```
+
+- **Prettier**: Consistent, readable HTML formatting
+- **Smart Truncation**: Container guards prevent `<html>`/`<body>` dumps, showing only relevant 10-line snippets
+- **Syntax Highlighting**: CLI-highlight provides color-coded terminal output
+- **CLI Output**: Structured tables with impact-level color coding
+
 ### Concurrency Engine
 
-Built on `p-limit` for controlled parallel execution. Configurable concurrency prevents resource exhaustion while maximizing throughput.
+Powered by `p-limit`, the **BatchRunner** manages controlled parallel execution. Configurable concurrency prevents resource exhaustion while maximizing throughput for enterprise-scale auditing.
 
 ```typescript
 const limit = pLimit(options.concurrency);
@@ -67,83 +72,20 @@ const results = await Promise.all(
 );
 ```
 
-### The Processing Pipeline
+## ✨ Key Features
 
-```
-Raw HTML → Prettier → Smart Truncation → CLI-Highlight → Terminal Output
-```
-
-Each stage is optimized for developer experience:
-
-- **Prettier**: Consistent formatting across all code snippets
-- **Smart Truncation**: Container guards prevent `<html>`/`<body>` dumps
-- **CLI-Highlight**: Syntax-colored output with theme support
-
-## ✨ Features
-
-- ⚡ **Lightning Fast**: Network interception blocks heavy assets for instant scans
-- 🎯 **Smart Snippets**: Actionable HTML snippets instead of page dumps
-- 🔧 **CI/CD Ready**: Configurable failure thresholds (`--fail-on`) for build pipelines
-- 🚀 **Parallel Execution**: Concurrent scanning with configurable limits
-- 📊 **Rich Output**: Color-coded impact levels, syntax highlighting, and structured tables
-- 📄 **JSON Export**: Full reports for integration with other tools
-- 🎨 **Developer Experience**: Clean CLI output with spinners, progress indicators, and clear messaging
-
-## 🚀 Installation
-
-```bash
-npm install -g accessjet
-# or
-yarn global add accessjet
-# or
-pnpm add -g accessjet
-```
-
-## 📖 Usage & Examples
-
-### Basic Accessibility Scan
-
-```bash
-accessjet check https://example.com
-```
-
-### High Concurrency Mode
-
-```bash
-accessjet check -c 10 https://site1.com https://site2.com https://site3.com
-```
-
-### CI/CD Strict Mode (Fail on Critical Issues Only)
-
-```bash
-accessjet check --fail-on critical https://myapp.com
-```
-
-### Export Full JSON Report
-
-```bash
-accessjet check -j https://example.com
-# Generates report.json with complete accessibility data
-```
-
-### Available Options
-
-```
-Usage: accessjet check [options] <urls...>
-
-Options:
-  -c, --concurrency <number>  Concurrency level (default: "5")
-  -j, --json                  Output full JSON report to report.json
-  -f, --fail-on <level>       Minimum impact level to fail the build
-                              (minor, moderate, serious, critical) (default: "moderate")
-  -h, --help                  Display help for command
-```
+- ⚡ **Sub-Second Audits**: Network interception eliminates asset loading bottlenecks
+- 🎯 **Smart Snippets**: Actionable HTML context instead of overwhelming page dumps
+- 🔧 **CI/CD Thresholds**: Configurable `--fail-on` levels for progressive compliance adoption
+- 🚀 **Zero-Config Setup**: Install and scan immediately, no complex configuration
+- 📊 **Rich Developer Experience**: Color-coded output, progress spinners, structured reporting
+- 📄 **JSON Export**: Full reports for integration with existing toolchains
 
 ## 🔗 CI/CD Integration
 
 ### GitHub Actions Workflow
 
-Add this to your `.github/workflows/accessibility.yml`:
+Add this to `.github/workflows/accessibility.yml` for automated auditing:
 
 ```yaml
 name: Accessibility Audit
@@ -169,58 +111,71 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
-      - name: Run Accessibility Audit (Development)
+      - name: Development Audit (Permissive)
         run: accessjet check --fail-on serious http://localhost:3000
         continue-on-error: true
 
-      - name: Run Accessibility Audit (Production)
+      - name: Production Audit (Strict)
         run: accessjet check --fail-on moderate https://myapp.com
 ```
 
-### Exit Codes
+## 🚀 Installation & Usage
 
-- `0`: Success (no violations or violations below threshold)
-- `1`: Failure (violations found at or above threshold)
+```bash
+npm install -g accessjet
+```
 
-## 🎬 Demo
+### Basic Scan
 
-![AccessJet Demo](demo.gif)
+```bash
+accessjet check https://example.com
+```
 
-_Watch AccessJet scan multiple URLs concurrently with instant feedback and actionable HTML snippets._
+### High Concurrency
+
+```bash
+accessjet check -c 10 https://site1.com https://site2.com
+```
+
+### CI/CD Strict Mode
+
+```bash
+accessjet check --fail-on critical https://myapp.com
+```
+
+### Full JSON Report
+
+```bash
+accessjet check -j https://example.com
+```
+
+### Options
+
+```
+Usage: accessjet check [options] <urls...>
+
+Options:
+  -c, --concurrency <number>  Concurrency level (default: "5")
+  -j, --json                  Output full JSON report to report.json
+  -f, --fail-on <level>       Minimum impact level to fail the build
+                              (minor, moderate, serious, critical) (default: "moderate")
+  -h, --help                  Display help for command
+```
 
 ## 🛠️ Development
 
 ```bash
-# Clone the repository
 git clone https://github.com/berkinduz/access-jet.git
 cd access-jet
-
-# Install dependencies
 npm install
-
-# Build the project
 npm run build
-
-# Run locally
-node dist/cli.js check https://example.com
+npm run generate-demo  # Generate demo SVG
 ```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Axe-core](https://github.com/dequelabs/axe-core) for the comprehensive accessibility rule engine
-- [Playwright](https://playwright.dev/) for the powerful browser automation framework
-- [Prettier](https://prettier.io/) for consistent code formatting
-- [Commander.js](https://github.com/tj/commander.js) for robust CLI argument parsing
+MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Built with ❤️ for developers who care about accessibility**</content>
-<parameter name="filePath">/Users/berkin/Documents/projects/access-jet/README.md
+**Built for developers who demand both speed and accuracy in accessibility compliance.**
