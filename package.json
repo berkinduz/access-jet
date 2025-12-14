@@ -2,14 +2,26 @@
   "name": "accessjet",
   "version": "1.0.0",
   "description": "Blazing fast, lightweight CLI tool for accessibility auditing",
-  "main": "dist/index.js",
+  "keywords": ["accessibility", "a11y", "cli", "playwright", "audit", "wcag"],
+  "author": "Berk Inan Duz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/berkinduz/access-jet.git"
+  },
   "bin": {
     "accessjet": "./dist/cli.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "generate-demo": "npx ts-node scripts/generate-demo.ts"
+    "generate-demo": "npx ts-node scripts/generate-demo.ts",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.11.0",
