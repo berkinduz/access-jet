@@ -1,0 +1,28 @@
+{
+  "name": "accessjet",
+  "version": "1.0.0",
+  "description": "Blazing fast, lightweight CLI tool for accessibility auditing",
+  "main": "dist/index.js",
+  "bin": {
+    "accessjet": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "^4.11.0",
+    "chalk": "^5.6.2",
+    "cli-highlight": "^2.1.11",
+    "cli-table3": "^0.6.5",
+    "commander": "^14.0.2",
+    "ora": "^9.0.0",
+    "p-limit": "^7.2.0",
+    "playwright": "^1.40.0",
+    "prettier": "^3.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
