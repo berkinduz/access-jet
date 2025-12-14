@@ -6,7 +6,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/berkinduz/access-jet.svg)](https://github.com/berkinduz/access-jet/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/berkinduz/access-jet.svg)](https://github.com/berkinduz/access-jet/issues)
 
-![AccessJet Demo](assets/demo.svg)
+![AccessJet Demo](https://raw.githubusercontent.com/berkinduz/access-jet/main/assets/demo.svg)
 
 AccessJet is a blazing fast, developer-centric accessibility (a11y) CLI tool built for modern CI/CD pipelines.
 
@@ -56,11 +56,11 @@ accessjet check https://myapp.com --fail-on critical
 
 ## ⚙️ Configuration
 
-| Flag | Alias | Description | Default |
-|------|-------|-------------|---------|
-| --concurrency | -c | Number of concurrent browser contexts. | 5 |
-| --fail-on | -f | Minimum impact level to trigger exit code 1 (minor, moderate, serious, critical). | moderate |
-| --json | -j | Export full report to report.json. | false |
+| Flag          | Alias | Description                                                                       | Default  |
+| ------------- | ----- | --------------------------------------------------------------------------------- | -------- |
+| --concurrency | -c    | Number of concurrent browser contexts.                                            | 5        |
+| --fail-on     | -f    | Minimum impact level to trigger exit code 1 (minor, moderate, serious, critical). | moderate |
+| --json        | -j    | Export full report to report.json.                                                | false    |
 
 ## 🏗 Architecture & Performance
 
