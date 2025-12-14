@@ -6,8 +6,6 @@
 [![GitHub stars](https://img.shields.io/github/stars/berkinduz/access-jet.svg)](https://github.com/berkinduz/access-jet/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/berkinduz/access-jet.svg)](https://github.com/berkinduz/access-jet/issues)
 
-![AccessJet Demo](https://raw.githubusercontent.com/berkinduz/access-jet/main/assets/demo.png)
-
 AccessJet is a blazing fast, developer-centric accessibility (a11y) CLI tool built for modern CI/CD pipelines.
 
 Unlike traditional tools that load entire web pages, AccessJet optimizes the auditing process by intercepting network requests and focusing purely on the DOM structure required for accurate analysis. It provides instant, actionable feedback directly in your terminal without the noise.
@@ -21,6 +19,8 @@ Unlike traditional tools that load entire web pages, AccessJet optimizes the aud
 🚦 **CI/CD Quality Gates**: Define strict failure thresholds (e.g., fail only on critical issues) to integrate safely into existing pipelines.
 
 🔄 **Concurrency**: Parallel execution engine allows scanning multiple URLs simultaneously without resource exhaustion.
+
+![AccessJet Demo](https://raw.githubusercontent.com/berkinduz/access-jet/main/assets/demo.png)
 
 ## 📦 Installation
 
