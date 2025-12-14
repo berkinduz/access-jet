@@ -6,7 +6,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/berkinduz/access-jet.svg)](https://github.com/berkinduz/access-jet/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/berkinduz/access-jet.svg)](https://github.com/berkinduz/access-jet/issues)
 
-![AccessJet Demo](https://raw.githubusercontent.com/berkinduz/access-jet/main/assets/demo.svg)
+![AccessJet Demo](https://raw.githubusercontent.com/berkinduz/access-jet/main/assets/demo.png)
 
 AccessJet is a blazing fast, developer-centric accessibility (a11y) CLI tool built for modern CI/CD pipelines.
 

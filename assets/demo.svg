@@ -1,6 +1,0 @@
-<svg width="800" height="280" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#1e1e1e" rx="8"/>
-      <text x="20" y="30" fill="#00ff00" font-family="Monaco, monospace" font-size="14">
-        ┌──────────────────────────────────────────────────┬──────────┬───────────────┬───────────────┐&#10;│ URL                                              │ Status   │ Violations    │ Critical      │&#10;├──────────────────────────────────────────────────┼──────────┼───────────────┼───────────────┤&#10;│ https://example.com                              │ ✅       │ 2             │ 0             │&#10;└──────────────────────────────────────────────────┴──────────┴───────────────┴───────────────┘&#10;&#10;Detailed Violation Logs:&#10;&#10;Build Errors for https://example.com:&#10;────────────────────────────────────────────────────────────────&#10;[MODERATE] landmark-one-main (Ensure the document has a main landmark)&#10;🔗 Help: https://dequeuniversity.com/rules/axe/4.11/landmark-one-main?application=playwright
-      </text>
-    </svg>
