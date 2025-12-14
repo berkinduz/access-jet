@@ -12,7 +12,7 @@ async function generateDemo() {
 
     // Run the CLI command and capture output
     const { stdout } = await execAsync(
-      "node dist/cli.js check https://example.com || true",
+      "node dist/cli.js check https://example.com --fail-on critical || true",
       {
         cwd: path.join(__dirname, ".."),
         maxBuffer: 1024 * 1024, // 1MB buffer
